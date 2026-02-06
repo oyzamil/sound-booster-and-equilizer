@@ -104,87 +104,24 @@ interface SegmentedProps {
   soundEnabled?: boolean;
 }
 
-interface Message {
-  target: 'worker' | 'offscreen' | 'popup';
-  type: string;
-  tabId?: number;
-  data?: AudioSettings;
-  value?: any;
-  preset?: EqualizerSettings;
-  streamId?: string;
-  state?: Browser.windows.WindowState;
-  settings?: AudioSettings;
-  index?: number;
-  success?: boolean;
+interface EQBand {
+  frequency: number;
+  gain: number;
+  label: string;
 }
 
 interface AudioSettings {
-  compressor: CompressorSettings;
-  eq: EqualizerSettings;
-  mono: boolean;
-  invert: boolean;
-  pan: number;
+  enabled: boolean;
   volume: number;
+  bands: EQBand[];
+  stereoMode: 'stereo' | 'mono';
+  invertChannels: boolean;
+  balance: number;
 }
 
-interface CompressorSettings {
-  threshold: number;
-  attack: number;
-  release: number;
-  ratio: number;
-  knee: number;
+interface Preset {
+  id: string;
+  name: string;
+  settings: Omit<AudioSettings, 'enabled'>;
+  isCustom: boolean;
 }
-
-interface EqualizerSettings {
-  twenty: number;
-  fifty: number;
-  oneHundred: number;
-  twoHundred: number;
-  fiveHundred: number;
-  oneThousand: number;
-  twoThousand: number;
-  fiveThousand: number;
-  tenThousand: number;
-  twentyThousand: number;
-}
-
-interface StorageData {
-  saved?: boolean;
-  settings?: AudioSettings;
-  collapsed?: boolean;
-}
-
-interface CapturedAudioConfig {
-  tabId: number;
-  stream: MediaStream;
-  settings: AudioSettings;
-}
-
-interface EqualizerBand {
-  type: BiquadFilterType;
-  frequency: number;
-}
-
-type PresetName =
-  | 'acoustic'
-  | 'bassBooster'
-  | 'bassReducer'
-  | 'classical'
-  | 'dance'
-  | 'deep'
-  | 'electronic'
-  | 'flat'
-  | 'hiphop'
-  | 'jazz'
-  | 'latin'
-  | 'loudness'
-  | 'lounge'
-  | 'piano'
-  | 'pop'
-  | 'rnb'
-  | 'rock'
-  | 'smallSpeakers'
-  | 'spokenWord'
-  | 'trebleBooster'
-  | 'trebleReducer'
-  | 'vocalBooster';

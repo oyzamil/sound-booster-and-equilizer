@@ -34,7 +34,7 @@ export default defineConfig({
       name: '__MSG_appName__',
       description: '__MSG_appDescription__',
       default_locale: 'en',
-      permissions: ['activeTab', 'tabCapture', 'storage', 'notifications', 'offscreen'],
+      permissions: ['offscreen', 'storage', 'tabs'],
     };
     if (browser === 'firefox') {
       manifestBase.browser_specific_settings = {

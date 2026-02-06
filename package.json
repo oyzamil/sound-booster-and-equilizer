@@ -1,6 +1,6 @@
 {
   "name": "sound-booster-and-equalizer",
-  "description": "Unleash the Power of Personalized Audio in your Browser",
+  "description": "Enhance audio with volume boost and custom equalizer presets",
   "private": true,
   "version": "0.0.1",
   "type": "module",

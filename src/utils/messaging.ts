@@ -22,6 +22,9 @@ interface ProtocolMap {
     success: boolean;
     message: string;
   };
+  updateSettings(data: AudioSettings): void;
+  getSettings(): AudioSettings;
+  applyToTab(data: { tabId: number; settings: AudioSettings }): void;
 }
 
 export const { sendMessage, onMessage } = defineExtensionMessaging<ProtocolMap>();

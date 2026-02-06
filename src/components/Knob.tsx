@@ -20,7 +20,7 @@ const Knob: React.FC<KnobProps> = ({
   unit = '',
   isBipolar = false,
   resetValue,
-  soundEnabled = false,
+  soundEnabled = true,
 }) => {
   const [isDragging, setIsDragging] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
