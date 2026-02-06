@@ -25,15 +25,16 @@ export function Controls({ settings, onUpdateSettings }: ControlsProps) {
             size="small"
             onChange={(balance) => onUpdateSettings({ balance })}
             isBipolar={true}
+            disabled={settings.stereoMode === 'mono'}
           />
         </div>
 
         <div className="w-full flex-col">
-          <div className="flex w-full gap-2">
-            <VolumeIcon className="size-8" muted={settings.volume === 0} />
+          <div className="flex-center w-full gap-2 text-[8px]">
+            <VolumeIcon className="size-6" muted={settings.volume === 0} />
             <Slider
               min={0}
-              max={4}
+              max={10}
               step={0.01}
               value={settings.volume}
               onChange={(volume) => onUpdateSettings({ volume })}
@@ -48,7 +49,7 @@ export function Controls({ settings, onUpdateSettings }: ControlsProps) {
               checked={settings.stereoMode === 'mono'}
               onChange={() => {
                 if (settings.stereoMode === 'mono') onUpdateSettings({ stereoMode: 'stereo' });
-                else onUpdateSettings({ stereoMode: 'mono' });
+                else onUpdateSettings({ stereoMode: 'mono', balance: 0 });
               }}
               label="Mono"
             />

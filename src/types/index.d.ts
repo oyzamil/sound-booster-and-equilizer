@@ -23,6 +23,7 @@ interface KnobProps {
   isBipolar?: boolean;
   resetValue?: number;
   soundEnabled?: boolean;
+  disabled?: boolean;
 }
 
 interface SliderProps {
@@ -117,6 +118,7 @@ interface AudioSettings {
   stereoMode: 'stereo' | 'mono';
   invertChannels: boolean;
   balance: number;
+  playbackRate?: number;
 }
 
 interface Preset {

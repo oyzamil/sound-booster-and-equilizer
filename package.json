@@ -47,7 +47,6 @@
     "zustand": "^5.0.10"
   },
   "devDependencies": {
-    "@types/arrive": "^2.4.4",
     "@types/chrome": "^0.1.36",
     "@types/react": "^19.2.7",
     "@types/react-dom": "^19.2.3",

@@ -111,7 +111,7 @@ export default function App() {
 
   return (
     <>
-      <div className="flex gap-1">
+      <div className="mb-2 flex gap-1">
         <Segmented
           options={[
             { value: 'light', label: 'Light' },
@@ -130,6 +130,7 @@ export default function App() {
           onChange={(enabled) => updateSettings({ enabled })}
           label={settings.enabled ? 'ON' : 'OFF'}
           orientation="horizontal"
+          size="large"
         />
       </div>
 

@@ -16,7 +16,7 @@ export function Equalizer({ settings, onUpdateSettings }: EqualizerProps) {
   }
 
   return (
-    <div className="mb-6">
+    <div className="w-full px-2">
       <div className="mb-2 flex items-center justify-between">
         <h2 className="heading mb-0">Equalizer</h2>
         <Button className="" onClick={resetBands}>
@@ -24,9 +24,9 @@ export function Equalizer({ settings, onUpdateSettings }: EqualizerProps) {
         </Button>
       </div>
 
-      <div className="flex items-end justify-between gap-0.5">
+      <div className="flex items-center justify-around gap-0.5">
         {settings.bands.map((band, index) => (
-          <div key={index}>
+          <div className="text-[7px]" key={index}>
             <Slider
               size="small"
               orientation="vertical"

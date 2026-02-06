@@ -21,6 +21,7 @@ const Knob: React.FC<KnobProps> = ({
   isBipolar = false,
   resetValue,
   soundEnabled = true,
+  disabled,
 }) => {
   const [isDragging, setIsDragging] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
@@ -247,7 +248,12 @@ const Knob: React.FC<KnobProps> = ({
   );
 
   return (
-    <div className="group flex flex-col items-center justify-center select-none">
+    <div
+      className={cn(
+        'group flex flex-col items-center justify-center select-none',
+        disabled && 'pointer-events-none'
+      )}
+    >
       <div
         className="relative flex cursor-pointer touch-none items-center justify-center"
         ref={containerRef}
@@ -338,14 +344,13 @@ const Knob: React.FC<KnobProps> = ({
         </svg>
 
         <div
-          className={`pointer-events-none absolute inset-0 flex items-center justify-center transition-opacity duration-200 ${isDragging ? 'opacity-100' : 'opacity-0'}`}
+          className={`pointer-events-none absolute inset-0 flex items-center justify-center transition-opacity duration-200 ${isDragging || disabled ? 'opacity-100' : 'opacity-0'}`}
         >
           <div
-            className="rounded border border-white/20 bg-[#111] px-2 py-0.5 font-mono text-[10px] font-bold text-white shadow-2xl"
+            className="border-theme bg-theme-inverse text-theme-inverse rounded border px-2 text-[10px] font-bold whitespace-pre"
             style={{ transform: `translateY(-${numericSize * 0.7}px)` }}
           >
-            {value?.toFixed(1)}
-            {unit}
+            {disabled ? 'Mono is ON' : value?.toFixed(1) + ' ' + unit}
           </div>
         </div>
       </div>

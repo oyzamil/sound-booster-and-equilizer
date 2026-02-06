@@ -216,7 +216,7 @@ const Slider: React.FC<SliderProps> = ({
     >
       {prefix && (
         <span
-          className={`${isVertical ? 'mb-2' : ''} text-[9px] font-semibold tracking-[0.25em] whitespace-nowrap uppercase`}
+          className={`${isVertical ? 'mb-2' : ''} font-semibold tracking-[0.25em] whitespace-nowrap uppercase`}
         >
           {prefix}
         </span>
@@ -274,7 +274,7 @@ const Slider: React.FC<SliderProps> = ({
           </div>
 
           <div
-            className={`absolute ${isVertical ? '-right-16' : '-top-10'} border-theme text-theme-inverse bg-theme-inverse rounded border px-2 py-0.5 font-mono text-[10px] transition-opacity ${isDragging ? 'opacity-100' : 'opacity-0'} z-50 whitespace-nowrap`}
+            className={`absolute ${isVertical ? '-right-16' : '-top-10'} border-theme text-theme-inverse bg-theme-inverse rounded border px-2 py-0.5 text-[10px] transition-opacity ${isDragging ? 'opacity-100' : 'opacity-0'} z-50 whitespace-nowrap`}
           >
             {value.toFixed(1)}
             {unit}
@@ -284,7 +284,7 @@ const Slider: React.FC<SliderProps> = ({
 
       {(label || suffix) && (
         <span
-          className={`${isVertical ? 'mt-2' : ''} text-[9px] font-semibold tracking-[0.25em] whitespace-nowrap uppercase`}
+          className={`${isVertical ? 'mt-2' : ''} font-semibold tracking-[0.25em] whitespace-nowrap uppercase`}
         >
           {label || suffix}
         </span>

@@ -1,4 +1,5 @@
 import { config, Settings } from '@/app.config';
+import { debounce } from 'lodash';
 import { create } from 'zustand';
 import { createJSONStorage, persist } from 'zustand/middleware';
 
@@ -13,14 +14,13 @@ type SettingsStore = {
   resetSettings: () => void;
 };
 
-const throttleMs = 800; // Adjust as needed (500-1200ms is typical for good UX)
+const throttleMs = 500; // Adjust as needed (500-1200ms is typical for good UX)
 
-type StorageChangeListener<T> = (value: T | null) => void;
-// Base adapter for browser.storage.local
+function extractSettings(persisted: any) {
+  return persisted?.state?.settings ?? persisted?.settings ?? null;
+}
+
 export const baseChromeAdapter = {
-  /**
-   * Read
-   */
   getItem: (name: string) =>
     new Promise<string | null>((resolve) => {
       browser.storage.local.get([name], (result) => {
@@ -29,42 +29,50 @@ export const baseChromeAdapter = {
       });
     }),
 
-  /**
-   * Write
-   */
   setItem: (name: string, value: string) =>
     new Promise<void>((resolve) => {
       browser.storage.local.set({ [name]: JSON.parse(value) }, () => resolve());
     }),
 
-  /**
-   * Remove
-   */
   removeItem: (name: string) =>
     new Promise<void>((resolve) => {
       browser.storage.local.remove([name], () => resolve());
     }),
 
-  /**
-   * 🔥 Subscribe to external changes (multi-tab sync)
-   * Zustand will call this automatically if present
-   */
-  subscribe: <T>(name: string, callback: StorageChangeListener<T>) => {
-    const listener = (changes: Record<string, chrome.storage.StorageChange>, area: string) => {
+  // ✅ CORRECT subscribe
+  subscribe: (onSettingsChange: (settings: Settings) => void) => {
+    const listener: Parameters<typeof browser.storage.onChanged.addListener>[0] = (
+      changes,
+      area
+    ) => {
       if (area !== 'local') return;
 
-      const change = changes[name];
-      if (!change) return;
+      const change = changes[config.APP.storageBucket];
+      if (!change?.newValue) return;
 
-      callback(change.newValue != null ? (change.newValue as T) : null);
+      try {
+        const nextPersisted =
+          typeof change.newValue === 'string' ? JSON.parse(change.newValue) : change.newValue;
+
+        const prevPersisted =
+          typeof change.oldValue === 'string' ? JSON.parse(change.oldValue) : change.oldValue;
+
+        const nextSettings = extractSettings(nextPersisted);
+        const prevSettings = extractSettings(prevPersisted);
+
+        if (!nextSettings) return;
+
+        // 🔥 DEEP CHECK
+        if (!isDeepEqual(prevSettings, nextSettings)) {
+          onSettingsChange(nextSettings);
+        }
+      } catch (err) {
+        console.error('[settings subscribe] parse failed', err);
+      }
     };
 
     browser.storage.onChanged.addListener(listener);
-
-    // Zustand expects an unsubscribe function
-    return () => {
-      browser.storage.onChanged.removeListener(listener);
-    };
+    return () => browser.storage.onChanged.removeListener(listener);
   },
 };
 
@@ -74,13 +82,19 @@ const throttledSetItem = throttle(baseChromeAdapter.setItem, throttleMs, {
   trailing: true, // Write after the last call in the throttle window
 });
 
+const debouncedSetItem = debounce(
+  (name: string, value: string) => baseChromeAdapter.setItem(name, value),
+  throttleMs
+);
+
 // Custom storage with throttled writes
 const throttledChromeAdapter = {
   ...baseChromeAdapter,
-  setItem: throttledSetItem,
+  setItem: debouncedSetItem,
 };
 
 const chromeJSONStorage = createJSONStorage(() => throttledChromeAdapter);
+
 const cloneDefaults = (): Settings => structuredClone(config.SETTINGS);
 
 export const useSettingsStore = create<SettingsStore>()(
@@ -117,11 +131,7 @@ export const useSettingsStore = create<SettingsStore>()(
       merge: (persistedState, currentState) => {
         const persisted = persistedState as Partial<SettingsStore> | undefined;
 
-        // const merged = persisted?.settings
-        //   ? deepMerge(config.SETTINGS, persisted.settings)
-        //   : config.SETTINGS;
-
-        const merged = deepMerge(cloneDefaults(), persisted?.settings ?? {}, currentState.settings);
+        const merged = deepMerge(cloneDefaults(), persisted?.settings ?? {});
 
         return {
           ...currentState,
@@ -147,16 +157,19 @@ const unsubscribe = useSettingsStore.subscribe((state) => {
   console.log('Settings changed:', state.settings);
 });
 
+const unsubscribe = baseChromeAdapter.subscribe((updatedSettings) => {
+  useSettingsStore.setState({ settings: updatedSettings });
+});
+
 useSettingsStore.persist.onFinishHydration(() => {
-      useSettingsStore.subscribe(
+	useSettingsStore.subscribe(
         (s) => s.settings,
         (state) => {
           console.log('Settings changed:', state);
-          scanForMedia();
-    }
+		  scanForMedia();
+		}
     );
 });
-
 
 //! Later, unsubscribe
 unsubscribe();
