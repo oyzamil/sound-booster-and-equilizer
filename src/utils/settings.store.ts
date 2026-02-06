@@ -1,6 +1,6 @@
 import { config, Settings } from '@/app.config';
 import { create } from 'zustand';
-import { createJSONStorage, persist, subscribeWithSelector } from 'zustand/middleware';
+import { createJSONStorage, persist } from 'zustand/middleware';
 
 export type DeepPartial<T> = {
   [P in keyof T]?: T[P] extends object ? (T[P] extends any[] ? T[P] : DeepPartial<T[P]>) : T[P];
@@ -50,7 +50,7 @@ export const baseChromeAdapter = {
    * Zustand will call this automatically if present
    */
   subscribe: <T>(name: string, callback: StorageChangeListener<T>) => {
-    const listener = (changes: Record<string, Browser.storage.StorageChange>, area: string) => {
+    const listener = (changes: Record<string, chrome.storage.StorageChange>, area: string) => {
       if (area !== 'local') return;
 
       const change = changes[name];
@@ -84,57 +84,51 @@ const chromeJSONStorage = createJSONStorage(() => throttledChromeAdapter);
 const cloneDefaults = (): Settings => structuredClone(config.SETTINGS);
 
 export const useSettingsStore = create<SettingsStore>()(
-  subscribeWithSelector(
-    persist(
-      (set, get) => ({
-        settings: cloneDefaults(),
+  persist(
+    (set, get) => ({
+      settings: cloneDefaults(),
 
-        saveSettings: (patch: DeepPartial<Settings>) =>
-          set((state) => ({
-            settings: deepMerge(state.settings, patch) as Settings,
-          })),
+      saveSettings: (patch: DeepPartial<Settings>) =>
+        set((state) => ({
+          settings: deepMerge(state.settings, patch) as Settings,
+        })),
 
-        removeSettings: (keys: (keyof Settings)[]) =>
-          set((state) => {
-            const updated = structuredClone(state.settings);
-            for (const key of keys) {
-              delete updated[key];
-            }
-            return { settings: updated };
-          }),
+      removeSettings: (keys: (keyof Settings)[]) =>
+        set((state) => {
+          const updated = structuredClone(state.settings);
+          for (const key of keys) {
+            delete updated[key];
+          }
+          return { settings: updated };
+        }),
 
-        resetSettings: () => set({ settings: cloneDefaults() }),
-      }),
-      {
-        name: config.APP.storageBucket,
+      resetSettings: () => set({ settings: cloneDefaults() }),
+    }),
+    {
+      name: config.APP.storageBucket,
 
-        // ✅ adapter with subscribe/onChanged
-        storage: chromeJSONStorage,
+      // ✅ adapter with subscribe/onChanged
+      storage: chromeJSONStorage,
 
-        // persist only what we need
-        partialize: (state) => ({ settings: state.settings }),
+      // persist only what we need
+      partialize: (state) => ({ settings: state.settings }),
 
-        // ✅ correct hydration merge order
-        merge: (persistedState, currentState) => {
-          const persisted = persistedState as Partial<SettingsStore> | undefined;
+      // ✅ correct hydration merge order
+      merge: (persistedState, currentState) => {
+        const persisted = persistedState as Partial<SettingsStore> | undefined;
 
-          // const merged = persisted?.settings
-          //   ? deepMerge(config.SETTINGS, persisted.settings)
-          //   : config.SETTINGS;
+        // const merged = persisted?.settings
+        //   ? deepMerge(config.SETTINGS, persisted.settings)
+        //   : config.SETTINGS;
 
-          const merged = deepMerge(
-            cloneDefaults(),
-            persisted?.settings ?? {},
-            currentState.settings
-          );
+        const merged = deepMerge(cloneDefaults(), persisted?.settings ?? {}, currentState.settings);
 
-          return {
-            ...currentState,
-            settings: merged,
-          };
-        },
-      }
-    )
+        return {
+          ...currentState,
+          settings: merged,
+        };
+      },
+    }
   )
 );
 

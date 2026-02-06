@@ -1,88 +1,102 @@
-import { useEffect, useState } from 'react';
 import { Controls } from './Controls';
 import { Equalizer } from './Equalizer';
 import { PresetManager } from './Presetmanager';
 
 export default function App() {
   const { settings, saveSettings } = useSettings();
-  const [options, setOptions] = useState<AudioSettings>(DEFAULT_SETTINGS);
-  const [presets, setPresets] = useState<Preset[]>([]);
-  const [activePresetId, setActivePresetId] = useState<string | null>(null);
 
-  useEffect(() => {
-    loadData();
-  }, []);
-
-  async function loadData() {
-    const [currentSettings, currentPresets, activeId] = await Promise.all([
-      chromeStorage.getSettings(),
-      chromeStorage.getPresets(),
-      chromeStorage.getActivePreset(),
-    ]);
-
-    setOptions(currentSettings);
-    setPresets(currentPresets);
-    setActivePresetId(activeId);
+  // ----------------------------
+  // Update settings
+  // ----------------------------
+  function updateSettings(patch: Partial<AudioSettings>) {
+    saveSettings({
+      ...settings,
+      ...patch,
+    });
   }
 
-  async function updateSettings(newSettings: Partial<AudioSettings>) {
-    const updated = { ...options, ...newSettings };
-    setOptions(updated);
-    await chromeStorage.setSettings(updated);
-    await sendMessage('updateSettings', updated);
-  }
-
-  async function applyPreset(preset: Preset) {
-    const updated = {
-      ...options,
+  // ----------------------------
+  // Apply a preset by ID
+  // ----------------------------
+  function applyPreset(preset: Preset) {
+    saveSettings({
+      ...settings,
       ...preset.settings,
-    };
-    setOptions(updated);
-    setActivePresetId(preset.id);
-    await chromeStorage.setSettings(updated);
-    await chromeStorage.setActivePreset(preset.id);
-    await sendMessage('updateSettings', updated);
+      activePresetId: preset.id, // cast fixes TS type
+    });
   }
 
-  async function saveAsPreset(name: string) {
+  // ----------------------------
+  // Save current settings as a new preset
+  // ----------------------------
+  function saveAsPreset(name: string) {
     const newPreset: Preset = {
       id: `custom-${Date.now()}`,
-      name,
+      name, // guaranteed string
       isCustom: true,
       settings: {
-        volume: options.volume,
-        bands: options.bands,
-        stereoMode: options.stereoMode,
-        invertChannels: options.invertChannels,
-        balance: options.balance,
+        volume: settings.volume,
+        bands: settings.bands,
+        stereoMode: settings.stereoMode,
+        invertChannels: settings.invertChannels,
+        balance: settings.balance,
       },
     };
 
-    await chromeStorage.addPreset(newPreset);
-    await loadData();
+    saveSettings({
+      ...settings,
+      presets: [...settings.presets, newPreset],
+    });
   }
 
-  async function deletePreset(id: string) {
-    await chromeStorage.deletePreset(id);
-    if (activePresetId === id) {
-      setActivePresetId(null);
-      await chromeStorage.setActivePreset(null);
-    }
-    await loadData();
+  // ----------------------------
+  // Delete a preset
+  // ----------------------------
+  function deletePreset(id: string) {
+    saveSettings({
+      ...settings,
+      presets: settings.presets.filter((p) => p.id !== id),
+      activePresetId: settings.activePresetId === id ? null : settings.activePresetId,
+    });
   }
 
-  async function importPreset(jsonString: string) {
+  // ----------------------------
+  // Import a preset from JSON string
+  // ----------------------------
+  function importPreset(jsonString: string) {
     try {
-      await chromeStorage.importPreset(jsonString);
-      await loadData();
+      const parsed = JSON.parse(jsonString) as Preset;
+
+      if (!parsed.name || !parsed.settings) {
+        throw new Error('Invalid preset format');
+      }
+
+      const preset: Preset = {
+        ...parsed,
+        id: `custom-${Date.now()}`,
+        isCustom: true,
+        name: parsed.name,
+        settings: parsed.settings,
+      };
+
+      saveSettings({
+        ...settings,
+        presets: [...settings.presets, preset],
+      });
     } catch (error) {
       alert('Failed to import preset: ' + (error as Error).message);
     }
   }
 
-  async function exportPreset(id: string) {
+  // ----------------------------
+  // Export a preset as JSON
+  // ----------------------------
+  function exportPreset(id: string) {
     try {
-      const json = await chromeStorage.exportPreset(id);
+      const preset = settings.presets.find((p) => p.id === id);
+      if (!preset) throw new Error('Preset not found');
+
+      const json = JSON.stringify(preset, null, 2);
       const blob = new Blob([json], { type: 'application/json' });
       const url = URL.createObjectURL(blob);
       const a = document.createElement('a');
@@ -112,9 +126,9 @@ export default function App() {
           block
         />
         <Switch
-          checked={options.enabled}
+          checked={settings.enabled}
           onChange={(enabled) => updateSettings({ enabled })}
-          label={options.enabled ? 'ON' : 'OFF'}
+          label={settings.enabled ? 'ON' : 'OFF'}
           orientation="horizontal"
         />
       </div>
@@ -124,12 +138,12 @@ export default function App() {
           'bg-theme border-theme flex justify-around overflow-x-hidden rounded-md border py-2'
         )}
       >
-        <Equalizer settings={options} onUpdateSettings={updateSettings} />
+        <Equalizer settings={settings} onUpdateSettings={updateSettings} />
       </div>
 
       <PresetManager
-        presets={presets}
-        activePresetId={activePresetId}
+        presets={settings.presets}
+        activePresetId={settings.activePresetId}
         onApplyPreset={applyPreset}
         onSavePreset={saveAsPreset}
         onDeletePreset={deletePreset}
@@ -137,7 +151,7 @@ export default function App() {
         onExportPreset={exportPreset}
       />
 
-      <Controls settings={options} onUpdateSettings={updateSettings} />
+      <Controls settings={settings} onUpdateSettings={updateSettings} />
     </>
   );
 }
