@@ -1,4 +1,4 @@
-# Audio Equalizer Extension - Global Settings Update
+# Sound Booster & Equalizer - Global Settings Update
 
 ## ✅ Changes Made
 
@@ -9,6 +9,8 @@
 - ❌ Removed "STOP ALL" button
 - ❌ Removed per-tab status display
 - ❌ Removed `stopAllTabs` message
+
+![Sound Booster & Equalizer](screenshots/sound-booster-and-equalizer.png)
 
 ### Simplified to Global Settings
 

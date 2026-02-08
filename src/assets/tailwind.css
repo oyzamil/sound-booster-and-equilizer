@@ -72,7 +72,7 @@
     @apply border-app-500 mb-10 border-l-2 pl-4 text-[10px] font-black tracking-[0.3em] text-gray-700 uppercase dark:text-white;
   }
   .makr {
-    @apply text-app-500/80 rounded border border-white/5 bg-black px-3 py-1 font-mono text-[9px] uppercase dark:bg-white;
+    @apply text-app-500/80 rounded border border-white/5 bg-black px-3 py-1 text-[9px] uppercase dark:bg-white;
   }
   .shadow-inset-theme {
     @apply shadow-[inset_0_2px_4px_rgba(0,0,0,0.3)] dark:shadow-[inset_0_2px_4px_rgba(0,0,0,0.8)];

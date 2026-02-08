@@ -65,6 +65,7 @@ interface SelectProps {
   search?: boolean;
   keyboardNavigation?: boolean;
   soundEnabled?: boolean;
+  disabled?: boolean;
 }
 
 interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
@@ -119,11 +120,4 @@ interface AudioSettings {
   invertChannels: boolean;
   balance: number;
   playbackRate?: number;
-}
-
-interface Preset {
-  id: string;
-  name: string;
-  settings: Omit<AudioSettings, 'enabled'>;
-  isCustom: boolean;
 }

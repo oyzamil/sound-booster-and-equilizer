@@ -21,6 +21,7 @@ const Select: React.FC<SelectProps> = ({
   search = false,
   keyboardNavigation = true,
   soundEnabled = true,
+  disabled,
 }) => {
   const [isOpen, setIsOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
@@ -169,7 +170,13 @@ const Select: React.FC<SelectProps> = ({
   const isPlaceholder = !selectedOption;
 
   return (
-    <div className="group flex w-full flex-col items-center select-none" ref={containerRef}>
+    <div
+      className={cn(
+        'group flex w-full flex-col items-center select-none',
+        disabled && 'pointer-events-none'
+      )}
+      ref={containerRef}
+    >
       <div
         className="relative w-full outline-none"
         tabIndex={0}
@@ -183,11 +190,23 @@ const Select: React.FC<SelectProps> = ({
       >
         {/* Main Well */}
         <div
-          className={`border-theme bg-theme shadow-inset-theme flex items-center justify-between rounded border transition-colors duration-200 ${padding} ${isOpen ? 'border-white/20' : 'group-hover:border-white/10'}`}
+          className={cn(
+            `border-theme shadow-inset-theme flex items-center justify-between rounded border bg-linear-to-b from-[#444] to-[#1a1a1a] transition-colors duration-200`,
+            padding,
+            isOpen ? 'border-white/20' : 'group-hover:border-white/10',
+            disabled && 'text-gray-500!'
+          )}
           style={{ height }}
         >
+          <div
+            className="absolute inset-0 rounded-md opacity-10 blur-sm"
+            style={{ backgroundColor: color }}
+          />
           <span
-            className={`pointer-events-none truncate font-mono font-semibold transition-colors ${isPlaceholder && !isOpen ? 'text-gray-600' : 'text-theme'}`}
+            className={cn(
+              'pointer-events-none z-9 truncate font-semibold transition-colors',
+              isPlaceholder && !isOpen ? 'text-gray-600' : 'text-white'
+            )}
             style={{
               fontSize,
               textShadow: !isPlaceholder && !isOpen ? `0 0 5px ${color}33` : 'none',
@@ -196,11 +215,11 @@ const Select: React.FC<SelectProps> = ({
             {displayLabel}
           </span>
           <svg
-            className={`h-3 w-3 transition-transform duration-200 ${isOpen ? 'rotate-180' : ''}`}
+            className={cn('h-3 w-3 transition-transform duration-200', isOpen && 'rotate-180')}
             style={{ color: isOpen ? color : '#444' }}
             fill="none"
             viewBox="0 0 24 24"
-            stroke="currentColor"
+            stroke="#ffffff"
           >
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M19 9l-7 7-7-7" />
           </svg>
@@ -209,13 +228,13 @@ const Select: React.FC<SelectProps> = ({
         {/* Dropdown Menu */}
         {isOpen && (
           <div
-            className="animate-in fade-in zoom-in-95 absolute z-100 mt-2 w-full overflow-hidden rounded-md border border-white/10 bg-[#1a1a1a] shadow-[0_20px_40px_rgba(0,0,0,0.9)] backdrop-blur-md duration-100"
+            className="animate-in fade-in zoom-in-95 border-theme shadow-inset-theme absolute z-100 mt-1 w-full overflow-hidden border bg-black backdrop-blur-md duration-100"
             onClick={(e) => e.stopPropagation()}
           >
             {search && (
               <div className="border-b border-white/5 p-2">
                 <input
-                  className="w-full border-b border-white/10 bg-black/50 px-2 py-1 font-mono text-[10px] text-white transition-colors outline-none focus:border-current"
+                  className="w-full border-b border-white/10 bg-black/50 px-2 py-1 text-[10px] text-white transition-colors outline-none focus:border-current"
                   ref={searchInputRef}
                   type="text"
                   placeholder="SEARCH..."
@@ -237,7 +256,7 @@ const Select: React.FC<SelectProps> = ({
                   const isFocused = idx === focusedIndex;
                   return (
                     <div
-                      className={`relative flex cursor-pointer items-center gap-3 px-3 py-2 font-mono text-[11px] font-bold transition-all ${isFocused ? 'bg-white/5' : ''} `}
+                      className={`relative flex cursor-pointer items-center gap-3 px-3 py-2 text-xs font-bold transition-all ${isFocused ? 'bg-white/5' : ''} `}
                       key={opt.value}
                       data-value={opt.value}
                       style={{
@@ -271,7 +290,7 @@ const Select: React.FC<SelectProps> = ({
                   );
                 })
               ) : (
-                <div className="px-3 py-4 text-center font-mono text-[9px] tracking-widest text-gray-700 uppercase">
+                <div className="px-3 py-4 text-center text-[9px] tracking-widest text-gray-700 uppercase">
                   No matches
                 </div>
               )}

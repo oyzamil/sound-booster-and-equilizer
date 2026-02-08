@@ -54,7 +54,7 @@ const Input: React.FC<InputProps> = ({
       <div className="relative w-full">
         <input
           {...props}
-          className={`w-full rounded border border-white/5 bg-black font-mono font-bold text-gray-300 shadow-[inset_0_2px_4px_rgba(0,0,0,0.8)] transition-all duration-200 outline-none placeholder:text-gray-700 focus:border-white/20 ${fontSize} ${py} ${px} ${className} `}
+          className={`w-full rounded border border-white/5 bg-black font-bold text-gray-300 shadow-[inset_0_2px_4px_rgba(0,0,0,0.8)] transition-all duration-200 outline-none placeholder:text-gray-700 focus:border-white/20 ${fontSize} ${py} ${px} ${className} `}
           onFocus={(e) => {
             initAudio();
             playFocus();

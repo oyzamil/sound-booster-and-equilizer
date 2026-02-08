@@ -111,10 +111,9 @@ const Segmented: React.FC<SegmentedProps> = ({
       >
         {/* Sliding Indicator Block */}
         <div
-          className="pointer-events-none absolute top-0 left-0 rounded-md border border-white/10 bg-linear-to-b from-[#444] to-[#1a1a1a] shadow-lg transition-all duration-300 ease-[cubic-bezier(0.23,1,0.32,1)]"
+          className="pointer-events-none absolute top-0 left-0 overflow-hidden rounded border border-white/10 bg-linear-to-b from-[#444] to-[#1a1a1a] shadow-md transition-all duration-300 ease-[cubic-bezier(0.23,1,0.32,1)]"
           style={{
             ...indicatorStyle,
-            boxShadow: `0 4px 12px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.05)`,
           }}
         >
           {/* Backlit Glow */}
@@ -128,7 +127,7 @@ const Segmented: React.FC<SegmentedProps> = ({
           const isActive = option.value === value;
           return (
             <button
-              className={`relative z-10 flex h-full flex-1 items-center justify-center gap-2 px-4 font-mono font-black tracking-widest uppercase transition-colors duration-300 ${fontSize} ${isActive ? 'text-white' : 'text-theme'} ${option.disabled ? 'cursor-not-allowed opacity-30' : 'cursor-pointer'} `}
+              className={`relative z-10 flex h-full flex-1 items-center justify-center gap-2 px-4 font-black tracking-widest uppercase transition-colors duration-300 ${fontSize} ${isActive ? 'text-white' : 'text-theme'} ${option.disabled ? 'cursor-not-allowed opacity-30' : 'cursor-pointer'} `}
               key={option.value}
               data-value={option.value}
               onClick={() => handleSelect(option.value, option.disabled)}

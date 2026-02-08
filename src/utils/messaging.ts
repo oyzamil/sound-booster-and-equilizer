@@ -1,4 +1,4 @@
-import { NotifyOptions } from '@/entrypoints/background/notifier';
+import { NotifyOptions } from '@/entrypoints/background/services/notifier';
 import { defineExtensionMessaging } from '@webext-core/messaging';
 import { defineWindowMessaging } from '@webext-core/messaging/page';
 

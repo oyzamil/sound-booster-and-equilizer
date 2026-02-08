@@ -105,7 +105,7 @@ const Switch: React.FC<SwitchProps> = ({
 
         {/* The Sliding Actuator */}
         <div
-          className="border-app-500/10 shadow-inset-theme absolute top-1/2 flex -translate-y-1/2 items-center justify-center rounded-full border bg-linear-to-b from-[#444] via-[#222] to-[#111] transition-all duration-200 ease-[cubic-bezier(0.23,1,0.32,1)]"
+          className="border-app-500/10 shadow-inset-theme absolute top-1/2 flex -translate-y-1/2 items-center justify-center overflow-hidden rounded-full border bg-linear-to-b from-[#444] via-[#222] to-[#111] transition-all duration-200 ease-[cubic-bezier(0.23,1,0.32,1)]"
           style={{
             width: thumb,
             height: thumb,
@@ -113,7 +113,10 @@ const Switch: React.FC<SwitchProps> = ({
           }}
         >
           {/* Actuator Top Highlight */}
-          <div className="pointer-events-none absolute inset-0 rounded-full bg-linear-to-r from-white/5 via-transparent to-black/20" />
+          <div
+            className="absolute inset-0 rounded-md opacity-60 blur-sm"
+            style={{ backgroundColor: color }}
+          />
 
           {/* Integrated Status LED Jewel */}
           <div

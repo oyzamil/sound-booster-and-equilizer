@@ -10,6 +10,7 @@ const SIZE_MAP: Record<
     minWidth: string;
     spinnerSize: string;
     iconSize: string;
+    height?: number;
   }
 > = {
   small: {
@@ -19,6 +20,7 @@ const SIZE_MAP: Record<
     minWidth: 'min-w-[60px]',
     spinnerSize: 'w-2.5 h-2.5',
     iconSize: 'w-2.5 h-2.5',
+    height: 24,
   },
   middle: {
     px: 'px-5',
@@ -27,6 +29,7 @@ const SIZE_MAP: Record<
     minWidth: 'min-w-[100px]',
     spinnerSize: 'w-3.5 h-3.5',
     iconSize: 'w-3.5 h-3.5',
+    height: 32,
   },
   large: {
     px: 'px-8',
@@ -35,6 +38,7 @@ const SIZE_MAP: Record<
     minWidth: 'min-w-[140px]',
     spinnerSize: 'w-4.5 h-4.5',
     iconSize: 'w-4.5 h-4.5',
+    height: 40,
   },
 };
 
@@ -55,7 +59,7 @@ const Button: React.FC<ButtonProps> = ({
   ...props
 }) => {
   const audioCtx = useRef<AudioContext | null>(null);
-  const { px, py, fontSize, minWidth, spinnerSize, iconSize } = SIZE_MAP[size];
+  const { px, py, fontSize, minWidth, spinnerSize, iconSize, height } = SIZE_MAP[size];
 
   // Default color logic
   const accentColor =
@@ -118,27 +122,23 @@ const Button: React.FC<ButtonProps> = ({
         {...props}
         className={cn(
           // base
-          `relative flex items-center justify-center gap-2.5 overflow-hidden font-mono font-semibold tracking-widest uppercase transition-all duration-75`,
+          `relative flex items-center justify-center gap-2.5 overflow-hidden font-semibold tracking-widest uppercase transition-all duration-75`,
           px,
           py,
           fontSize,
 
           // sizing
-          !isMinimal && minWidth,
+          // !isMinimal && minWidth,
 
           // shape & layout
-          !isMinimal ? 'rounded border border-white/10' : 'border-none bg-transparent p-0',
+          !isMinimal
+            ? 'border-theme rounded border bg-linear-to-b from-[#444] to-[#1a1a1a]'
+            : 'border-none bg-transparent p-0',
 
           // state
           disabled || loading
             ? 'cursor-not-allowed opacity-40'
             : 'cursor-pointer active:translate-y-px',
-
-          // variants
-          !isMinimal &&
-            (isPrimary
-              ? 'bg-linear-to-b from-[#444] to-[#1a1a1a] text-white shadow-none'
-              : `bg-linear-to-b from-[#2a2a2a] to-[#0f0f0f] text-gray-400 shadow-none hover:text-gray-200`),
 
           // text styles
           isText && 'text-gray-500 hover:text-gray-200',
@@ -154,11 +154,15 @@ const Button: React.FC<ButtonProps> = ({
           borderLeftColor: (isPrimary || danger) && !isMinimal ? accentColor : undefined,
           borderLeftWidth: (isPrimary || danger) && !isMinimal ? '3px' : undefined,
           color: isLink ? accentColor : undefined,
+          height,
         }}
       >
         {/* Shine highlight (only for non-minimal buttons) */}
         {!isMinimal && (
-          <div className="pointer-events-none absolute inset-0 bg-linear-to-r from-white/5 via-transparent to-black/20" />
+          <div
+            className="absolute inset-0 rounded-md opacity-20 blur-sm"
+            style={{ backgroundColor: accentColor }}
+          />
         )}
 
         {loading ? (
@@ -177,7 +181,7 @@ const Button: React.FC<ButtonProps> = ({
         )}
 
         <span
-          className="relative z-10"
+          className="relative z-10 text-white"
           style={{ color: danger && !isPrimary && !isLink ? accentColor : undefined }}
         >
           {label || children}

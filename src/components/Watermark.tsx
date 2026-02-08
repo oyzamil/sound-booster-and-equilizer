@@ -38,7 +38,13 @@ const Watermark = ({
       <div className="flex-col">
         <span className="block font-semibold">{i18n.t('appShortName')}</span>
         {tagline && (
-          <span className={cn('block text-sm', taglineClassName)}>
+          <span
+            className={cn(
+              'block max-w-70 truncate text-[12px] leading-tight dark:text-gray-500',
+              taglineClassName
+            )}
+            title={tagline ? tagline : i18n.t('appName')}
+          >
             {tagline ? tagline : i18n.t('appName')}
           </span>
         )}
@@ -49,14 +55,24 @@ const Watermark = ({
 
 export default Watermark;
 
-export const Logo = ({ className }: { className?: string }) => {
+export const Logo = ({
+  rootClassName,
+  className,
+  children,
+}: {
+  rootClassName?: string;
+  className?: string;
+  children?: string | React.ReactNode;
+}) => {
   return (
     <span
       className={cn(
-        'flex-center bg-app-800 dark:bg-app-800/30 min-h-10 w-auto min-w-10 rounded-md p-0'
+        'flex-center bg-app-800 dark:bg-app-800/30 min-h-10 w-auto min-w-10 rounded-md p-0',
+        rootClassName
       )}
     >
       <img className={cn('size-8', className)} src={logo} />
+      {children}
     </span>
   );
 };
