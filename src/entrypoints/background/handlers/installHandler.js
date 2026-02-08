@@ -110,18 +110,14 @@ const initializeConfig = async () => {
  * Handle extension installation
  */
 export const handleInstall = async (details) => {
+  if (import.meta.env.PROD) {
+    browser.tabs.create({
+      url: `https://muzammil.work?event=${getPackageProp('name')}-${details.reason}`,
+    });
+  }
   if (details.reason === browser.runtime.OnInstalledReason.INSTALL) {
     await initializeConfig();
-    // browser.tabs.create({
-    //   url: 'https://addonup.com/extensions/equalizer-for-browser-orange',
-    //   active: true,
-    // });
   } else if (details.reason === browser.runtime.OnInstalledReason.UPDATE) {
     await initializeConfig();
-
-    // browser.tabs.create({
-    //   url: 'https://addonup.com/extensions/equalizer-for-browser-orange',
-    //   active: true,
-    // });
   }
 };
